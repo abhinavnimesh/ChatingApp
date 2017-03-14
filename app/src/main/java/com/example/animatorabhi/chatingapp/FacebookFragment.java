@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -61,8 +62,8 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
 
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private FirebaseAuth firebaseAuth;
     private FirebaseDatabase database;
     private boolean isUserExist = true;
 
@@ -82,8 +83,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_facebook, container, false);
         callbackManager = CallbackManager.Factory.create();
-        database = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+
 
         accessTokenTracker = new AccessTokenTracker() {
             @Override
@@ -119,6 +119,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
                 //  img=profile.getProfilePictureUri();
                 displayMessage(profile);
                 updateUI();
+                handleFacebookAccessToken(accessToken);
 
             }
 
@@ -134,8 +135,31 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         });
 
 
+        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuthListener=new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            FirebaseUser  user=firebaseAuth.getCurrentUser();
+
+            }
+        };
+
 
         return view;
+    }
+
+    private void handleFacebookAccessToken(AccessToken accessToken) {
+        AuthCredential credential=FacebookAuthProvider.getCredential(accessToken.getToken());
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                  if(task.isSuccessful())
+                  {
+                      Toast.makeText(getActivity(),"log in",Toast.LENGTH_SHORT).show();
+                      updateUI();
+                  }
+            }
+        });
     }
 
     @Override
@@ -214,6 +238,16 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        firebaseAuth.addAuthStateListener(firebaseAuthListener);
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+firebaseAuth.removeAuthStateListener(firebaseAuthListener);    }
 }
 
