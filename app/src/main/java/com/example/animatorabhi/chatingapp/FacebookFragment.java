@@ -1,9 +1,12 @@
 package com.example.animatorabhi.chatingapp;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +58,7 @@ import static com.facebook.GraphRequest.TAG;
 public class FacebookFragment extends android.support.v4.app.Fragment {
     private LoginButton loginButton;
     private CallbackManager callbackManager;
-
+    private ProgressBar pb;
     private TextView textView;
 
     private ImageView img;
@@ -104,9 +108,16 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         img = (ImageView) view.findViewById(R.id.profilePicture);
         textView = (TextView) view.findViewById(R.id.textView);
         loginButton = (LoginButton) view.findViewById(R.id.loginButton);
+        pb = (ProgressBar) view.findViewById(R.id.progressBar1);
         loginButton.setReadPermissions("email");
         // If using in a fragment
         loginButton.setFragment(this);
+        pb.setVisibility(View.INVISIBLE);
+
+
+
+
+        updateUI();
         // Other app specific specialization
 
         // Callback registration
@@ -117,7 +128,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
                 AccessToken accessToken = loginResult.getAccessToken();
                 Profile profile = Profile.getCurrentProfile();
                 //  img=profile.getProfilePictureUri();
-                displayMessage(profile);
+
                 updateUI();
                 handleFacebookAccessToken(accessToken);
 
@@ -135,11 +146,11 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         });
 
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseAuthListener=new FirebaseAuth.AuthStateListener() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            FirebaseUser  user=firebaseAuth.getCurrentUser();
+                FirebaseUser user = firebaseAuth.getCurrentUser();
 
             }
         };
@@ -149,15 +160,16 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     }
 
     private void handleFacebookAccessToken(AccessToken accessToken) {
-        AuthCredential credential=FacebookAuthProvider.getCredential(accessToken.getToken());
+        pb.setVisibility(View.VISIBLE);
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                  if(task.isSuccessful())
-                  {
-                      Toast.makeText(getActivity(),"log in",Toast.LENGTH_SHORT).show();
-                      updateUI();
-                  }
+                if (task.isSuccessful()) {
+                    Toast.makeText(getActivity(), "log in", Toast.LENGTH_SHORT).show();
+                    updateUI();
+                    pb.setVisibility(View.INVISIBLE);
+                }
             }
         });
     }
@@ -183,8 +195,11 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         // postPhotoButton.setEnabled(enableButtons || canPresentShareDialogWithPhotos);
 
         Profile profile = Profile.getCurrentProfile();
+        displayMessage(profile);
         if (enableButtons && profile != null) {
+
             new LoadProfileImage(img).execute(profile.getProfilePictureUri(200, 200).toString());
+
             // greeting.setText(getString(R.string.hello_user, profile.getFirstName()));
             //   postingEnabled = true;
             //   postPhotoButton.setVisibility(View.VISIBLE);
@@ -218,7 +233,18 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
             try {
                 InputStream in = new java.net.URL(url).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
+            //save image to internal storage
+                new ImageSaver(getActivity()).
+                        setFileName("myImage.png").
+                        setDirectoryName("images").
+                        save(mIcon11);
             } catch (Exception e) {
+                //load image from internal storage
+                Bitmap bitmap = new ImageSaver(getActivity()).
+                        setFileName("myImage.png").
+                        setDirectoryName("images").
+                        load();
+                mIcon11=bitmap;
                 Log.e("Error", e.getMessage());
                 e.printStackTrace();
             }
@@ -248,6 +274,23 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     public void onStop() {
         super.onStop();
 
-firebaseAuth.removeAuthStateListener(firebaseAuthListener);    }
+        firebaseAuth.removeAuthStateListener(firebaseAuthListener);
+    }
+
+    public static boolean isNetworkAvaliable(Context ctx) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) ctx
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if ((connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED)
+                || (connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null && connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                .getState() == NetworkInfo.State.CONNECTED)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
