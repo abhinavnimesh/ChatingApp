@@ -6,24 +6,19 @@
     android:layout_height="match_parent"
     tools:context="com.example.animatorabhi.chatingapp.MainActivity">
 
-    <Button
-        android:id="@+id/z"
-        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
-        android:layout_width="239dp"
-        android:layout_height="114dp"
-        android:text="Button"
-        tools:layout_editor_absoluteX="28dp"
-        tools:layout_editor_absoluteY="119dp" />
-
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/demoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
         tools:layout_editor_absoluteY="283dp"
-        app:layout_constraintRight_toLeftOf="@+id/z"
-        android:layout_marginRight="0dp"
-        app:layout_constraintLeft_toRightOf="@+id/z"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintHorizontal_bias="0.804" />
+        tools:layout_editor_absoluteX="28dp" />
+
+    <ImageView
+        android:id="@+id/demoImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="16dp" />
 </android.support.constraint.ConstraintLayout>

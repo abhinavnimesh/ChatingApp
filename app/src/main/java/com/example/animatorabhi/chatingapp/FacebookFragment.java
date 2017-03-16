@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.animatorabhi.chatingapp.chat.ChatActivity;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -31,6 +32,7 @@ import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -60,7 +62,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     private CallbackManager callbackManager;
     private ProgressBar pb;
     private TextView textView;
-
+   Button demoActivity;
     private ImageView img;
 
     private AccessTokenTracker accessTokenTracker;
@@ -75,6 +77,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getActivity());
+        database = FirebaseDatabase.getInstance();
 
 
         // Other app specific specialization
@@ -110,12 +113,19 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         loginButton = (LoginButton) view.findViewById(R.id.loginButton);
         pb = (ProgressBar) view.findViewById(R.id.progressBar1);
         loginButton.setReadPermissions("email");
+        demoActivity= (Button) view.findViewById(R.id.demoActivity);
         // If using in a fragment
         loginButton.setFragment(this);
         pb.setVisibility(View.INVISIBLE);
 
 
-
+        demoActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(getActivity(),ChatActivity.class);
+                startActivity(i);
+            }
+        });
 
         updateUI();
         // Other app specific specialization
@@ -151,7 +161,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-
+              //  checkForUserAndSignuUp(firebaseAuth.getCurrentUser());
             }
         };
 
@@ -165,15 +175,98 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
+                if (task.isSuccessful()&& firebaseAuth.getCurrentUser() != null) {
                     Toast.makeText(getActivity(), "log in", Toast.LENGTH_SHORT).show();
                     updateUI();
                     pb.setVisibility(View.INVISIBLE);
+                    checkForUserAndSignuUp(firebaseAuth.getCurrentUser());
                 }
+                
+
+
             }
+
+            private void checkForUserAndSignuUp(final FirebaseUser currentUser) {
+
+
+
+
+
+
+                    final DatabaseReference firebase = database.getReference().child("users").child(currentUser.getUid());
+                    firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+
+                            // customLoaderDialog.hide();
+                            // firebase.removeEventListener(this);
+                            if (snapshot.getValue() != null) {
+                    /*GenericTypeIndicator<Map<String, String>> genericTypeIndicator = new GenericTypeIndicator<Map<String, String>>() {};
+                    Map<String, String> hashMap = snapshot.getValue(genericTypeIndicator );
+
+*/
+                                try {
+                                    Map<String, String> hashMap = snapshot.getValue(HashMap.class);
+                                    Prefs.setUserId(getActivity(), currentUser.getUid());
+                                    Prefs.setUSERNAME(getActivity(), getValuesWithValid(hashMap, "displayName"));
+                                    Prefs.setEMAIL(getActivity(), getValuesWithValid(hashMap, "email"));
+                                    Prefs.setPhotoUri(getActivity(), getValuesWithValid(hashMap, "profileImageUri"));
+                                } catch (Exception e) {
+
+                                }
+                                isUserExist = true;
+                                //  if (customLoaderDialog != null)
+                                //    customLoaderDialog.hide();
+                          //      Intent intent = new Intent(getActivity(), MainActivity.class);
+                             //   startActivity(intent);
+                               // finish();
+                            } else {
+                                // if (customLoaderDialog != null)
+                                // customLoaderDialog.hide();
+                                isUserExist = false;
+                                UserModel userModel = new UserModel("" + currentUser.getUid(), "online", "" + currentUser.getDisplayName(), "", "Android", "" + currentUser.getPhotoUrl(), 0);
+                                userModel.setEmail(currentUser.getEmail());
+                                firebase.setValue(userModel);
+                                Prefs.setUserId(getActivity(), currentUser.getUid());
+                                Prefs.setUSERNAME(getActivity(), currentUser.getDisplayName());
+                                Prefs.setEMAIL(getActivity(), currentUser.getEmail());
+                                Prefs.setPhotoUri(getActivity(), currentUser.getPhotoUrl() + "");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            //customLoaderDialog.hide();
+                            isUserExist = false;
+                            UserModel userModel = new UserModel("" + currentUser.getUid(), "offline", "" + currentUser.getDisplayName(), "", "Android", "" + currentUser.getPhotoUrl(), 0);
+                            userModel.setEmail(currentUser.getEmail());
+                            Prefs.setUserId(getActivity(), currentUser.getUid());
+                            Prefs.setUSERNAME(getActivity(), currentUser.getDisplayName());
+                            Prefs.setEMAIL(getActivity(), currentUser.getEmail());
+                            Prefs.setPhotoUri(getActivity(), currentUser.getPhotoUrl() + "");
+                            firebase.setValue(userModel);
+                        }
+
+                    });
+
+
+
+
+            }
+
+
         });
     }
 
+
+
+    private String getValuesWithValid(Map<String, String> hashMap, String displayName) {
+        if (hashMap.containsKey("" + displayName) && hashMap.get("" + displayName).length() > 0) {
+            return hashMap.get("" + displayName) + "";
+        } else {
+            return "";
+        }
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
