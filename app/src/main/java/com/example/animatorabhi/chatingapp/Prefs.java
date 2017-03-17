@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
 public class Prefs {
 
 
-    private static final String IS_PERSISTENCE = "is_persistance";
+  //  private static final String IS_PERSISTENCE = "is_persistance";
     private static final String USER_ID = "userId";
     private static final String USERNAME = "userName";
     private static final String EMAIL = "email";

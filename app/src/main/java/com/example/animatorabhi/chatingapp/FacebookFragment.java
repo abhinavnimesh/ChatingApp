@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.animatorabhi.chatingapp.chat.ChatActivity;
+import com.example.animatorabhi.chatingapp.chat.UserList;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -122,7 +123,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         demoActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(getActivity(),ChatActivity.class);
+                Intent i=new Intent(getActivity(),UserList.class);
                 startActivity(i);
             }
         });
