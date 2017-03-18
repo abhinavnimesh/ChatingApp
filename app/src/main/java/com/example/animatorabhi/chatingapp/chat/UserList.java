@@ -8,11 +8,13 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
@@ -38,7 +40,7 @@ public class UserList extends AppCompatActivity {
 
         Button sendBtn= (Button) findViewById(R.id.sendBtn);
         final EditText messageTxt= (EditText) findViewById(R.id.messageTxt);
-        ListView messageLst= (ListView) findViewById(R.id.userList);
+        ListView userList= (ListView) findViewById(R.id.userList);
         database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReference().child("chat");
         final DatabaseReference firebase = database.getReference().child("users");
@@ -63,7 +65,7 @@ public class UserList extends AppCompatActivity {
             }
         };
 
-        messageLst.setAdapter(userAdapter);
+        userList.setAdapter(userAdapter);
 
         firebase.addChildEventListener(new ChildEventListener() {
             @Override
@@ -120,5 +122,16 @@ public class UserList extends AppCompatActivity {
         };*/
         // messageLst.setAdapter(adapter);
 
+
+        userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                UserModel u=users.get(i);
+                Toast.makeText(UserList.this,u.getUserId(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
+
 }
