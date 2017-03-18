@@ -1,6 +1,7 @@
 package com.example.animatorabhi.chatingapp.chat;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -128,6 +129,12 @@ public class UserList extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 UserModel u=users.get(i);
                 Toast.makeText(UserList.this,u.getUserId(),Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(UserList.this,ChatActivity.class);
+                intent.putExtra("reciverUserName",u.getFirstName());
+                intent.putExtra("reciverUid", u.getUserId());
+                intent.putExtra("reciverProfilePic", u.getProfileImageUri());
+                UserList.this.startActivity(intent);
+
             }
         });
 

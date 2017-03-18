@@ -44,10 +44,11 @@ public class ChatActivity extends AppCompatActivity {
         final DatabaseReference firebase = database.getReference().child("users");
 
       //  String key=firebase.getKey();
-        final ArrayList<UserModel> users=new ArrayList<>();
+       // final ArrayList<UserModel> users=new ArrayList<>();
+        /* this activity contains code for both user list and chat messages just use setadapter to toggle between them*/
 
 
-        final ArrayAdapter<UserModel> userAdapter=new ArrayAdapter<UserModel>(
+      /*  final ArrayAdapter<UserModel> userAdapter=new ArrayAdapter<UserModel>(
                 this,android.R.layout.two_line_list_item,users
         ){
             @NonNull
@@ -61,11 +62,11 @@ public class ChatActivity extends AppCompatActivity {
                 ((TextView)view.findViewById(android.R.id.text2)).setText(user.getStatus());
                 return view;
             }
-        };
+        };*/
 
-        messageLst.setAdapter(userAdapter);
+      //  messageLst.setAdapter(userAdapter);//for user list
 
-        firebase.addChildEventListener(new ChildEventListener() {
+  /*      firebase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 UserModel userModel = dataSnapshot.getValue(UserModel.class);
@@ -95,15 +96,15 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-        {}
+        });*/
+        //{}
 
         // Firebase.setAndroidContext(this);
      //   final Firebase ref=new Firebase("https://chattingapp-3daae.firebaseio.com/");
         // ref.child("users");
 
 
-        sendBtn.setOnClickListener(new View.OnClickListener() {
+       sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ChatMessage chat=new ChatMessage(Prefs.getUSERNAME(ChatActivity.this),messageTxt.getText().toString());
@@ -140,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
                 {view.setBackground(getDrawable(R.drawable.ch));}*/
          /*   }
         };*/
-       // messageLst.setAdapter(adapter);
+       messageLst.setAdapter(adapter);//for messages
      ref.addChildEventListener(new ChildEventListener() {
          @Override
          public void onChildAdded(DataSnapshot dataSnapshot, String s) {
