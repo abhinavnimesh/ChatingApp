@@ -5,18 +5,26 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
-import com.example.animatorabhi.chatingapp.chat.adapter.MyAdapterNew;
+import com.example.animatorabhi.chatingapp.UserModel;
+import com.example.animatorabhi.chatingapp.adapter.MyAdapterNew;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConListActivity extends AppCompatActivity {
-
+    private FirebaseDatabase database;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<ChatConModel> conList;
+
     //   String myDataset[]={"A0","b0"};
 
     @Override
@@ -30,7 +38,40 @@ public class ConListActivity extends AppCompatActivity {
         conList=new ArrayList<>();
         mAdapter=new MyAdapterNew(this,conList);
         mRecyclerView.setAdapter(mAdapter);
-        prepareAlbums();
+        database = FirebaseDatabase.getInstance();
+        final DatabaseReference firebase = database.getReference().child("conversation_list").child(Prefs.getUserId(this));
+        firebase.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+               ChatConModel chatConModel = dataSnapshot.getValue(ChatConModel.class);
+                //dataSnapshot.child("YSXSfLPWo0NAiocsDmLNhc4LzTV2");
+                //  ChatMessage chat=new ChatMessage("Abhi","hello dummy");
+                // UserModel userModel = new UserModel("Abhi","hello dummy");
+               conList.add(chatConModel);
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+      //  prepareAlbums();
 
     }
 

@@ -1,4 +1,4 @@
-package com.example.animatorabhi.chatingapp.chat.adapter;
+package com.example.animatorabhi.chatingapp.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
