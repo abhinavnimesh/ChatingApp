@@ -3,4 +3,9 @@
     <string name="facebook_app_id">754610541389309</string>
 
     <string name="fb_login_protocol_scheme">fb754610541389309</string>
+
+    <string name="item_title">Palais Garnier</string>
+    <string name="item_desc">The Palais Garnier which locates in Paris was built from 1861 for
+        the Paris Opera.
+    </string>
 </resources>

@@ -38,5 +38,11 @@
         android:id="@+id/demoActivity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Demo Activity" />
+        android:text="users" />
+
+    <Button
+        android:id="@+id/chatList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="chat list" />
 </LinearLayout>

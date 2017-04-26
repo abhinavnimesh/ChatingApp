@@ -45,8 +45,9 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".chat.ChatActivity"></activity>
-        <activity android:name=".chat.UserList"></activity>
+        <activity android:name=".chat.ChatActivity" />
+        <activity android:name=".chat.UserList" />
+        <activity android:name=".chat.ConListActivity"></activity>
     </application>
 
 </manifest>

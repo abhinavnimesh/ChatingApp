@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.animatorabhi.chatingapp.chat.ChatActivity;
+import com.example.animatorabhi.chatingapp.chat.ConListActivity;
 import com.example.animatorabhi.chatingapp.chat.UserList;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -64,6 +65,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
     private ProgressBar pb;
     private TextView textView;
    Button demoActivity;
+    Button chatList;
     private ImageView img;
 
     private AccessTokenTracker accessTokenTracker;
@@ -115,6 +117,7 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
         pb = (ProgressBar) view.findViewById(R.id.progressBar1);
         loginButton.setReadPermissions("email");
         demoActivity= (Button) view.findViewById(R.id.demoActivity);
+        chatList=(Button) view.findViewById(R.id.chatList);
         // If using in a fragment
         loginButton.setFragment(this);
         pb.setVisibility(View.INVISIBLE);
@@ -124,6 +127,13 @@ public class FacebookFragment extends android.support.v4.app.Fragment {
             @Override
             public void onClick(View view) {
                 Intent i=new Intent(getActivity(),UserList.class);
+                startActivity(i);
+            }
+        });
+        chatList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(getActivity(),ConListActivity.class);
                 startActivity(i);
             }
         });

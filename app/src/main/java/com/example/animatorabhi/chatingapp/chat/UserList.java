@@ -34,6 +34,8 @@ import java.util.List;
 
 public class UserList extends AppCompatActivity {
     private FirebaseDatabase database;
+    private String chat_id;
+    ChatConModel chatConModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,7 @@ public class UserList extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReference().child("chat");
         final DatabaseReference firebase = database.getReference().child("users");
+
 
         //  String key=firebase.getKey();
         final ArrayList<UserModel> users=new ArrayList<>();
@@ -128,11 +131,14 @@ public class UserList extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 UserModel u=users.get(i);
+            /*  String chat_id=  */checkStatus(u.getUserId());
                 Toast.makeText(UserList.this,u.getUserId(),Toast.LENGTH_SHORT).show();
                 Intent intent=new Intent(UserList.this,ChatActivity.class);
                 intent.putExtra("reciverUserName",u.getFirstName());
                 intent.putExtra("reciverUid", u.getUserId());
                 intent.putExtra("reciverProfilePic", u.getProfileImageUri());
+                intent.putExtra("chat_id", chat_id);
+Log.d("user chat id:",""+chat_id);
                 UserList.this.startActivity(intent);
 
             }
@@ -140,5 +146,32 @@ public class UserList extends AppCompatActivity {
 
     }
 
+    private void checkStatus(String reciverUid) {
+        Log.d("user c status rec id:",reciverUid);
+
+        DatabaseReference senderRefrence = database.getReference().child("conversation_list").child(Prefs.getUserId(UserList.this)).child(reciverUid);
+        // senderRefrence.child("yo").setValue("ha");
+        senderRefrence.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    dataSnapshot.getValue();
+                    ChatConModel chatConModel = dataSnapshot.getValue(ChatConModel.class);
+                    chat_id = chatConModel.getChat_id();
+                    Log.d("data check hear -> ", "" + dataSnapshot);
+                    Log.d("user  status chat id:",chat_id);
+                    // setUpFirebaseAdapter();
+                } else{
+                    Log.d("user else","no");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
 }
