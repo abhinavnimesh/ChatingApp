@@ -19,6 +19,10 @@ import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
 
 import com.example.animatorabhi.chatingapp.UserModel;
+import com.example.animatorabhi.chatingapp.global.Constant;
+import com.example.animatorabhi.chatingapp.global.Utils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +39,8 @@ public class ChatActivity extends AppCompatActivity {
    private String reciverUserName, reciverUid, reciverProfilePic;
     private String senderId;
     private String chat_id;
-
+private FirebaseAuth mAuth;
+FirebaseUser cUser;
     Intent intent;
     private boolean chatIdExist=false;
     private boolean isAlready = false;
@@ -44,6 +49,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         intent=getIntent();
+        mAuth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         final DatabaseReference refChat = database.getReference().child("chat");
         final DatabaseReference firebaseUser = database.getReference().child("users");
@@ -53,14 +59,14 @@ public class ChatActivity extends AppCompatActivity {
         Button sendBtn= (Button) findViewById(R.id.sendBtn);
         final EditText messageTxt= (EditText) findViewById(R.id.messageTxt);
         ListView messageLst= (ListView) findViewById(R.id.messageLst);
+cUser=mAuth.getCurrentUser();
 
-
-        senderId=Prefs.getUserId(this);
+        senderId=cUser.getUid();
         if (chat_id == null) {
-           // checkStatus();
+          checkStatus();
         } else {
             chatIdExist = true;
-           //checkStatus();
+          // checkStatus();
             setUpFirebaseAdapter();
         }
       //  String key=firebase.getKey();
@@ -143,8 +149,8 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
 
-
-                ChatMessage chat = new ChatMessage(Prefs.getUSERNAME(ChatActivity.this), messageTxt.getText().toString());
+String msg=messageTxt.getText().toString();
+                ChatMessage chat = new ChatMessage(Prefs.getUSERNAME(ChatActivity.this), messageTxt.getText().toString(), senderId, Utils.getCurrentTimeStamp());
 
 
                     chatMessageRefrence.setValue(chat);
@@ -154,6 +160,7 @@ public class ChatActivity extends AppCompatActivity {
                     //Sender Refrence
                     ChatConModel chatConModel = new ChatConModel();
                     chatConModel.setDisplayName("" + reciverUserName);
+                chatConModel.setTimestamp(Utils.getCurrentTimeStamp());
                    // chatConModel.setBadge(0);
                 Log.d("send mess chat id:",""+chat_id);
 
@@ -164,6 +171,7 @@ public class ChatActivity extends AppCompatActivity {
                     } else {
                         chatConModel.setLatestactivity(message);
                     }*/
+                    chatConModel.setLatestactivity(msg);
                     chatConModel.setProfilePic(reciverProfilePic);
                    // chatConModel.setTimestamp(Utils.getCurrentTimeStamp());
                     chatConModel.setUser_id(reciverUid);
@@ -173,8 +181,10 @@ public class ChatActivity extends AppCompatActivity {
                     DatabaseReference reciverRefrence = database.getReference().child("conversation_list").child(reciverUid).child(senderId);
                     chatConModel.setUser_id(senderId);
                   //  chatConModel.setBadge(getBadgerCount(reciverRefrence));
+                    chatConModel.setLatestactivity(msg);
                     chatConModel.setDisplayName("" + Prefs.getUSERNAME(ChatActivity.this));
                     chatConModel.setProfilePic("" + Prefs.getPhotoUri(ChatActivity.this));
+                chatConModel.setTimestamp(Utils.getCurrentTimeStamp());
                     reciverRefrence.setValue(chatConModel);
 
             }
@@ -210,7 +220,7 @@ public class ChatActivity extends AppCompatActivity {
         };*/
        messageLst.setAdapter(adapter);//for messages
         Log.d("before read chat_id",""+chat_id);
-     refChat.child("-Ki_-SO1JxUxIDIpguT0").addChildEventListener(new ChildEventListener() {
+     refChat.child(""+chat_id).addChildEventListener(new ChildEventListener() {
          @Override
          public void onChildAdded(DataSnapshot dataSnapshot, String s) {
              ChatMessage chat=dataSnapshot.getValue(ChatMessage.class);
@@ -249,7 +259,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void checkStatus() {
-        DatabaseReference senderRefrence = database.getReference().child("conversation_list").child("jwiJxUQDmBfkvhtvgBmVAUKFdDe2").child("tRzyV5405uQ1qAJ4hnfHmQVlLbb2");
+        DatabaseReference senderRefrence = database.getReference().child("conversation_list").child(cUser.getUid()).child(reciverUid);
        // senderRefrence.child("yo").setValue("ha");
         senderRefrence.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

@@ -14,6 +14,17 @@ public class ChatConModel {
     private String creatorId;
     private String chat_id;
 
+    public ChatConModel(String isDelete, String latestactivity, double timestamp, String user_id, String profilePic, String displayName, String creatorId, String chat_id) {
+        this.isDelete = isDelete;
+        this.latestactivity = latestactivity;
+        this.timestamp = timestamp;
+        this.user_id = user_id;
+        this.profilePic = profilePic;
+        this.displayName = displayName;
+        this.creatorId = creatorId;
+        this.chat_id = chat_id;
+    }
+
     public ChatConModel(double timestamp, String user_id, String profilePic, String displayName, String chat_id) {
         this.timestamp = timestamp;
         this.user_id = user_id;

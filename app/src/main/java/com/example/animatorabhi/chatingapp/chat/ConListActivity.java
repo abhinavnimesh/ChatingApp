@@ -4,11 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
-import com.example.animatorabhi.chatingapp.UserModel;
-import com.example.animatorabhi.chatingapp.adapter.MyAdapterNew;
+import com.example.animatorabhi.chatingapp.adapter.MyConListAdapter;
+import com.example.animatorabhi.chatingapp.global.Constant;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +26,7 @@ public class ConListActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<ChatConModel> conList;
+    private FirebaseAuth mAuth;
 
     //   String myDataset[]={"A0","b0"};
 
@@ -36,10 +39,13 @@ public class ConListActivity extends AppCompatActivity {
         mLayoutManager=new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         conList=new ArrayList<>();
-        mAdapter=new MyAdapterNew(this,conList);
+        mAdapter=new MyConListAdapter(this,conList);
         mRecyclerView.setAdapter(mAdapter);
+        mAuth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        final DatabaseReference firebase = database.getReference().child("conversation_list").child(Prefs.getUserId(this));
+        Constant.USER_ID = mAuth.getCurrentUser().getUid();
+        final DatabaseReference firebase = database.getReference().child("conversation_list").child(Constant.USER_ID);
+       Log.d("pref id",""+Prefs.getUserId(this));
         firebase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -48,6 +54,8 @@ public class ConListActivity extends AppCompatActivity {
                 //  ChatMessage chat=new ChatMessage("Abhi","hello dummy");
                 // UserModel userModel = new UserModel("Abhi","hello dummy");
                conList.add(chatConModel);
+               Log.d("childadded",""+ conList);
+                Log.d("prefId","hello"+Prefs.getUserId(getApplicationContext()));
                 mAdapter.notifyDataSetChanged();
             }
 

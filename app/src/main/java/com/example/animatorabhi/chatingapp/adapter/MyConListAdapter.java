@@ -2,6 +2,7 @@ package com.example.animatorabhi.chatingapp.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,9 @@ import com.example.animatorabhi.chatingapp.chat.ChatConModel;
 import java.util.List;
 
 
-public class MyAdapterNew extends RecyclerView.Adapter<MyAdapterNew.MyViewHolder> {
+public class MyConListAdapter extends RecyclerView.Adapter<MyConListAdapter.MyViewHolder> {
         //private String[] mDataset;
-        private Context mContext;
+       private Context mContext;
         private List<ChatConModel> conList;
 
         public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -36,7 +37,7 @@ public class MyAdapterNew extends RecyclerView.Adapter<MyAdapterNew.MyViewHolder
         }
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapterNew(Context mContext, List<ChatConModel> conList) {
+        public MyConListAdapter(Context mContext, List<ChatConModel> conList) {
            this.mContext=mContext;
             this.conList=conList;
         }
@@ -56,10 +57,27 @@ public class MyAdapterNew extends RecyclerView.Adapter<MyAdapterNew.MyViewHolder
         public void onBindViewHolder(final MyViewHolder holder, int position) {
            // holder.mTextView.setText(mDataset[position]);
             ChatConModel chatConModel=conList.get(position);
-           // holder.avator.setImageResource(Integer.parseInt(chatConModel.getProfilePic()));
+            Log.d("onbind1",""+chatConModel.getChat_id());
+            Log.d("onbind2",""+chatConModel.getDisplayName());
+            Log.d("onbind3",""+chatConModel.getLatestactivity());
+
+//            holder.avator.setImageResource(Integer.parseInt(chatConModel.getProfilePic()));
             holder.description.setText(chatConModel.getLatestactivity());
             holder.name.setText(chatConModel.getDisplayName());
-            Glide.with(mContext).load(chatConModel.getProfilePic()).into(holder.avator);
+         //   holder.avator.setImageResource(R.drawable.a_avator);
+           Glide.with(mContext).load(chatConModel.getProfilePic()).into(holder.avator);
+            //crop image round
+          /*  Glide.with(mContext)
+                    .load(chatConModel.getProfilePic())
+                    .asBitmap().fitCenter()
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            holder.avator.setImageBitmap(ImageHelper.getRoundedCornerBitmap(mContext, resource, 200, 200, 200, false, false, false, false));
+                        }
+                    });
+            Log.d("onbindglide", String.valueOf(chatConModel));*/
+
         }
 
         @Override

@@ -21,6 +21,8 @@ import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
 
 import com.example.animatorabhi.chatingapp.UserModel;
+import com.example.animatorabhi.chatingapp.global.Constant;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,6 +38,7 @@ public class UserList extends AppCompatActivity {
     private FirebaseDatabase database;
     private String chat_id;
     ChatConModel chatConModel;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +47,12 @@ public class UserList extends AppCompatActivity {
         Button sendBtn= (Button) findViewById(R.id.sendBtn);
         final EditText messageTxt= (EditText) findViewById(R.id.messageTxt);
         ListView userList= (ListView) findViewById(R.id.userList);
+        mAuth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReference().child("chat");
         final DatabaseReference firebase = database.getReference().child("users");
 
-
+        Constant.USER_ID = mAuth.getCurrentUser().getUid();
         //  String key=firebase.getKey();
         final ArrayList<UserModel> users=new ArrayList<>();
 
@@ -149,7 +153,7 @@ Log.d("user chat id:",""+chat_id);
     private void checkStatus(String reciverUid) {
         Log.d("user c status rec id:",reciverUid);
 
-        DatabaseReference senderRefrence = database.getReference().child("conversation_list").child(Prefs.getUserId(UserList.this)).child(reciverUid);
+        DatabaseReference senderRefrence = database.getReference().child("conversation_list").child(Constant.USER_ID).child(reciverUid);
         // senderRefrence.child("yo").setValue("ha");
         senderRefrence.addValueEventListener(new ValueEventListener() {
             @Override
