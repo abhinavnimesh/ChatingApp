@@ -162,7 +162,7 @@ String msg=messageTxt.getText().toString();
                     chatConModel.setDisplayName("" + reciverUserName);
                 chatConModel.setTimestamp(Utils.getCurrentTimeStamp());
                    // chatConModel.setBadge(0);
-                Log.d("send mess chat id:",""+chat_id);
+                Log.d("send  mess chat id:",""+chat_id);
 
                 chatConModel.setChat_id(chat_id);
                   //  chatConModel.setIsDelete("NO");
