@@ -29,7 +29,7 @@ public class ChatMessage {
         this.timestamp = timestamp;
     }
 
-    public ChatMessage(String name, String message, String sender, long timestamp) {
+  public ChatMessage(String name, String message, String sender, long timestamp) {
         this.name = name;
         this.message = message;
         this.sender = sender;

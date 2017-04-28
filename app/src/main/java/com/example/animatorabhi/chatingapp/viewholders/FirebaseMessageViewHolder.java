@@ -42,8 +42,8 @@ public class FirebaseMessageViewHolder extends RecyclerView.ViewHolder implement
         TextView tvReciverView = (TextView) mView.findViewById(R.id.tvReciverView);
         TextView tvTimeStampSender = (TextView) mView.findViewById(R.id.tvTimeStampSender);
         TextView tvTimeStampReciver = (TextView) mView.findViewById(R.id.tvTimeStampReciver);
-     //   ImageView imgDelete = (ImageView) mView.findViewById(R.id.imgDelete);
-      //  llOpt = (LinearLayout) mView.findViewById(R.id.llOpt);
+      ImageView imgDelete = (ImageView) mView.findViewById(R.id.imgDelete);
+       llOpt = (LinearLayout) mView.findViewById(R.id.llOpt);
         LinearLayout llSenderView = (LinearLayout) mView.findViewById(R.id.llSenderView);
         LinearLayout llReciverView = (LinearLayout) mView.findViewById(R.id.llReciverView);
         if (messageModel.getSender().equals("" + Constant.USER_ID)) {
@@ -66,13 +66,13 @@ public class FirebaseMessageViewHolder extends RecyclerView.ViewHolder implement
                 return false;
             }
         });
-     /*   imgDelete.setOnClickListener(new View.OnClickListener() {
+      imgDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 llOpt.setVisibility(View.GONE);
-                Log.d("imgDelete--->", "imgDelete....." + messageModel.getText() + "getAdapterPosition();---" + getAdapterPosition() + "getItemId()---->" + getItemId());
+                Log.d("imgDelete--->", "imgDelete....." + messageModel.getMessage() + "getAdapterPosition();---" + getAdapterPosition() + "getItemId()---->" + getItemId());
             }
-        });*/
+        });
 
     }
 

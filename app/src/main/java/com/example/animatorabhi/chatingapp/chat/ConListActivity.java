@@ -1,13 +1,18 @@
 package com.example.animatorabhi.chatingapp.chat;
 
+import android.content.Intent;
+import android.graphics.Movie;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
+import com.example.animatorabhi.chatingapp.RecyclerTouchListener;
 import com.example.animatorabhi.chatingapp.adapter.MyConListAdapter;
 import com.example.animatorabhi.chatingapp.global.Constant;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,6 +51,24 @@ public class ConListActivity extends AppCompatActivity {
         Constant.USER_ID = mAuth.getCurrentUser().getUid();
         final DatabaseReference firebase = database.getReference().child("conversation_list").child(Constant.USER_ID);
        Log.d("pref id",""+Prefs.getUserId(this));
+        mRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), mRecyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                ChatConModel chatConModel = conList.get(position);
+                Toast.makeText(getApplicationContext(), chatConModel.getDisplayName() + " is selected!", Toast.LENGTH_SHORT).show();
+                Intent i=new Intent(ConListActivity.this,ChatActivity.class);
+                i.putExtra("reciverUserName",chatConModel.getDisplayName());
+                i.putExtra("reciverUid",chatConModel.getUser_id());
+                i.putExtra("reciverProfilePic",chatConModel.getProfilePic());
+                i.putExtra("chat_id",chatConModel.getChat_id());
+                startActivity(i);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
         firebase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

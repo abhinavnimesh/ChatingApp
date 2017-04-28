@@ -1,6 +1,7 @@
 package com.example.animatorabhi.chatingapp.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,17 +12,26 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.animatorabhi.chatingapp.R;
+import com.example.animatorabhi.chatingapp.chat.ChatActivity;
 import com.example.animatorabhi.chatingapp.chat.ChatConModel;
 
 import java.util.List;
 
 
-public class MyConListAdapter extends RecyclerView.Adapter<MyConListAdapter.MyViewHolder> {
+public class MyConListAdapter extends RecyclerView.Adapter<MyConListAdapter.MyViewHolder> implements View.OnClickListener {
         //private String[] mDataset;
        private Context mContext;
         private List<ChatConModel> conList;
 
-        public static class MyViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public void onClick(View v) {
+        Context context = v.getContext();
+        Intent intent = new Intent(context, ChatActivity.class);
+        context.startActivity(intent);
+    }
+
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
             public ImageView avator;
             public TextView name;
@@ -33,6 +43,8 @@ public class MyConListAdapter extends RecyclerView.Adapter<MyConListAdapter.MyVi
                 avator= (ImageView) v.findViewById(R.id.list_avatar);
                 name= (TextView) v.findViewById(R.id.list_title);
                 description= (TextView) v.findViewById(R.id.list_desc);
+
+
             }
         }
 
@@ -40,6 +52,7 @@ public class MyConListAdapter extends RecyclerView.Adapter<MyConListAdapter.MyVi
         public MyConListAdapter(Context mContext, List<ChatConModel> conList) {
            this.mContext=mContext;
             this.conList=conList;
+
         }
 
         @Override

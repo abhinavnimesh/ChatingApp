@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
         import android.support.annotation.NonNull;
         import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,8 @@ import com.example.animatorabhi.chatingapp.Prefs;
 import com.example.animatorabhi.chatingapp.R;
 
 import com.example.animatorabhi.chatingapp.UserModel;
+import com.example.animatorabhi.chatingapp.adapter.MyChatAdapter;
+import com.example.animatorabhi.chatingapp.adapter.MyConListAdapter;
 import com.example.animatorabhi.chatingapp.global.Constant;
 import com.example.animatorabhi.chatingapp.global.Utils;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,16 +42,31 @@ public class ChatActivity extends AppCompatActivity {
    private FirebaseDatabase database;
    private String reciverUserName, reciverUid, reciverProfilePic;
     private String senderId;
-    private String chat_id;
+    private String chat_id="";
 private FirebaseAuth mAuth;
 FirebaseUser cUser;
     Intent intent;
     private boolean chatIdExist=false;
     private boolean isAlready = false;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private List<ChatMessage> chatList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_chat_converstion);
+
+        mRecyclerView= (RecyclerView) findViewById(R.id.reclerChat);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager=new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        chatList=new ArrayList<>();
+        mAdapter=new MyChatAdapter(this,chatList);
+        mRecyclerView.setAdapter(mAdapter);
+
+
         intent=getIntent();
         mAuth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -56,9 +75,9 @@ FirebaseUser cUser;
        // checkStatus();
         getDataFromBundle();
         //checkStatus();
-        Button sendBtn= (Button) findViewById(R.id.sendBtn);
-        final EditText messageTxt= (EditText) findViewById(R.id.messageTxt);
-        ListView messageLst= (ListView) findViewById(R.id.messageLst);
+        Button sendBtn= (Button) findViewById(R.id.btnSend);
+        final EditText messageTxt= (EditText) findViewById(R.id.edtMessage);
+        //ListView messageLst= (ListView) findViewById(R.id.messageLst);
 cUser=mAuth.getCurrentUser();
 
         senderId=cUser.getUid();
@@ -146,6 +165,10 @@ cUser=mAuth.getCurrentUser();
                     chat_id = chatId;
 
                      chatMessageRefrence = chatIdRefrence.push();
+                    if (!chatIdExist) {
+                        setUpFirebaseAdapter();
+                    }
+                    chatIdExist = true;
                 }
 
 
@@ -189,8 +212,8 @@ String msg=messageTxt.getText().toString();
 
             }
         });
-        final List<ChatMessage> messages=new LinkedList<>();
-        final ArrayAdapter<ChatMessage> adapter=new ArrayAdapter<ChatMessage>(
+      //  final List<ChatMessage> messages=new LinkedList<>();
+       /* final ArrayAdapter<ChatMessage> adapter=new ArrayAdapter<ChatMessage>(
                 this,android.R.layout.two_line_list_item,messages
         ){
             @NonNull
@@ -203,7 +226,7 @@ String msg=messageTxt.getText().toString();
                 ((TextView)view.findViewById(android.R.id.text2)).setText(chat.getMessage());
                 return view;
             }
-        };
+        };*/
         //  Query recent=ref.limitToLast(5);
      /* FirebaseListAdapter<ChatMessage> adapter=new FirebaseListAdapter<ChatMessage>(this,ChatMessage.class,android.R.layout.two_line_list_item,recent) {
             @Override
@@ -218,37 +241,8 @@ String msg=messageTxt.getText().toString();
                 {view.setBackground(getDrawable(R.drawable.ch));}*/
          /*   }
         };*/
-       messageLst.setAdapter(adapter);//for messages
-        Log.d("before read chat_id",""+chat_id);
-     refChat.child(""+chat_id).addChildEventListener(new ChildEventListener() {
-         @Override
-         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-             ChatMessage chat=dataSnapshot.getValue(ChatMessage.class);
-             //  ChatMessage chat=new ChatMessage("Abhi","hello dummy");
-             messages.add(chat);
-             adapter.notifyDataSetChanged();
-         }
+      // messageLst.setAdapter(adapter);//for messages
 
-         @Override
-         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-         }
-
-         @Override
-         public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-         }
-
-         @Override
-         public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-         }
-
-         @Override
-         public void onCancelled(DatabaseError databaseError) {
-
-         }
-     });
     }
 
     private void sendMessage(){
@@ -256,6 +250,37 @@ String msg=messageTxt.getText().toString();
     }
 
     private void setUpFirebaseAdapter() {
+        final DatabaseReference refChat = database.getReference().child("chat");
+        Log.d("before read chat_id",""+chat_id);
+        refChat.child(""+chat_id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ChatMessage chat=dataSnapshot.getValue(ChatMessage.class);
+                //  ChatMessage chat=new ChatMessage("Abhi","hello dummy");
+                chatList.add(chat);
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void checkStatus() {
@@ -297,5 +322,24 @@ String msg=messageTxt.getText().toString();
 
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        chat_id=null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        chat_id=null;
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        chat_id=null;
     }
 }
